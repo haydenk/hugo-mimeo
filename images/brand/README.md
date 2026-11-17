@@ -89,7 +89,7 @@ Text verbatim and only these strings:
 "mimeo"
 "A blog that reads"
 "like a text file."
-"haydenk.github.io/hugo-mimeo"
+"haydenk.github.io/mimeo"
 Typography: entirely monospaced; bold typewriter/slab-serif character in the wordmark, crisp clean technical monospace for support. Wordmark about 112px; tagline about 38px, URL at least 22px. No neon glow, no gradient, no 3D effects, no browser chrome, no buttons, no other text, no watermark. Cohesive, quiet editorial quality.
 ```
 
