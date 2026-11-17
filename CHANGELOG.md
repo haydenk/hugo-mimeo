@@ -63,5 +63,5 @@ First release.
   check, GitHub Actions for CI and releases, release archives that unpack
   to `themes/mimeo`, and a demo deployed to GitHub Pages on each release.
 
-[Unreleased]: https://github.com/haydenk/hugo-mimeo/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/haydenk/hugo-mimeo/releases/tag/v1.0.0
+[Unreleased]: https://github.com/haydenk/mimeo/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/haydenk/mimeo/releases/tag/v1.0.0
