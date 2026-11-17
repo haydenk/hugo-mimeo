@@ -1,0 +1,62 @@
+# Theme defaults. The demo site lives in exampleSite/.
+
+[module]
+  [module.hugoVersion]
+    extended = false
+    min = "0.158.0"
+
+# A plain-text copy of every page: /posts/2026/01/02/slug.txt beside the HTML.
+# The template (layouts/page.txt) writes the same mail-style header the HTML
+# shows, then the page's raw Markdown.
+#
+# Hugo merges a theme's [outputFormats] into the site, but by default not
+# its [outputs] or [markup]. A site either copies the blocks below (the
+# README's Install section lists them as a required step) or sets
+# `_merge = 'shallow'` under its own [outputs] and [markup] to inherit them.
+# Without `page = ['html', 'txt']` no .txt files are written.
+[outputFormats]
+  [outputFormats.txt]
+    mediaType = "text/plain"
+    baseName = "index"
+    isPlainText = true
+    rel = "alternate"
+    ugly = true
+
+[outputs]
+  home = ['html', 'rss']
+  page = ['html', 'txt']
+  section = ['html']
+  taxonomy = ['html']
+  term = ['html']
+
+# noClasses = false: code blocks get Chroma classes, which chroma.css colours
+# in light and dark; wrapStandAloneImageWithinParagraph = false: a captioned
+# standalone image becomes a <figure>.
+[markup]
+  [markup.highlight]
+    noClasses = false
+  [markup.goldmark.parser]
+    wrapStandAloneImageWithinParagraph = false
+
+[params]
+  # All optional. Shown with example values; none is set by default.
+  #
+  # authorName = "Jane Doe"        # the From: line (page `author` param wins)
+  # description = ""               # meta description fallback
+  # images = ["images/og.png"]     # relative to baseURL (page `images` wins)
+  # imageAlt = ""                 # accessible description of the share image
+  # homeIntroContent = ""          # Markdown shown above the home page listing
+  # homeCollection = ["posts"]     # section(s) listed on the home page
+  # homeCollectionTitle = "Latest" # heading over that listing
+  # homeCount = 10                 # entries on the home page
+  # listSummaries = false          # one-line summary under each list entry
+  # listDateFormat = "2006-01-02"  # Go layout for list dates
+  # readTime = false               # X-Read-Time: header line on pages
+  # showTags = true                # Tags: header line on pages
+  # footerContent = ""             # Markdown under the "-- " signature line
+  # inlineCSS = true               # false links the stylesheet instead
+  #
+  # [[params.social]]              # signature lines: "github  https://..."
+  #   name = "github"
+  #   title = "GitHub"
+  #   url = "https://github.com/you"

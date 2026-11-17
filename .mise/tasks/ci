@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Everything CI runs: formatting check, all linters, and the tests"
+#MISE depends=["format:check", "lint:all", "test"]
+set -euo pipefail
+
+echo "CI checks passed"

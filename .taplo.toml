@@ -1,0 +1,18 @@
+# Formatting rules for the TOML in this repo (hugo.toml, theme.toml,
+# .mise.toml, .rumdl.toml, exampleSite/hugo.toml). `mise run format:check`
+# enforces them.
+exclude = ["exampleSite/public/**", "exampleSite/resources/**"]
+
+[formatting]
+indent_tables = true
+indent_string = "  "
+align_comments = false
+reorder_keys = false
+indent_entries = true
+
+# Flat key = value files read better unindented.
+[[rule]]
+include = [".mise.toml", ".taplo.toml"]
+
+  [rule.formatting]
+  indent_entries = false

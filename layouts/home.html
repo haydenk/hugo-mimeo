@@ -1,0 +1,17 @@
+{{ define "main" }}
+{{- with site.Params.homeIntroContent }}
+<div class="intro">{{ . | markdownify }}</div>
+{{- end }}
+{{ .Content }}
+{{- $sections := site.Params.homeCollection | default "posts" }}
+{{- if reflect.IsSlice $sections }}{{ else }}{{ $sections = slice $sections }}{{ end }}
+{{- $pages := where site.RegularPages "Section" "in" $sections | first (site.Params.homeCount | default 10) }}
+{{- with $pages }}
+<h2>{{ site.Params.homeCollectionTitle | default "Latest" }}</h2>
+<ul class="entries">
+{{- range . }}
+{{ partial "entry.html" (dict "page" . "list" $) }}
+{{- end }}
+</ul>
+{{- end }}
+{{ end }}

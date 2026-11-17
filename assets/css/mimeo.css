@@ -1,0 +1,611 @@
+/*
+  Mimeo: a page that reads like a text file.
+
+  Monospace, left-aligned, 80 columns wide. Headings keep their Markdown
+  markers, lists their asterisks, quotes their angle brackets. Colours are
+  light-dark() pairs driven by the system preference: no JavaScript, no
+  toggle. Set --font-mono in assets/css/custom.css to change the face.
+*/
+
+:root {
+  color-scheme: light dark;
+
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", "DejaVu Sans Mono", monospace;
+
+  --bg: light-dark(#fbfbf8, #121417);
+  --bg-2: light-dark(#f1f1ec, #1b1e23);
+  --fg: light-dark(#1f2328, #d8dde3);
+  --muted: light-dark(#5c6570, #8b949e);
+  --rule: light-dark(#d0d7de, #30363d);
+  --link: light-dark(#0b5cad, #79b8ff);
+  --link-visited: light-dark(#5a3e9b, #b392f0);
+  --mark: light-dark(#9a6700, #e3b341);
+
+  --width: 80ch;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 15px at the browser default, scaling with the reader's font-size setting. */
+html {
+  font: 93.75%/1.5 var(--font-mono);
+  font-variant-ligatures: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 1.5rem 1rem 3rem;
+  max-width: calc(var(--width) + 2rem);
+  background: var(--bg);
+  color: var(--fg);
+  overflow-wrap: break-word;
+}
+
+/* ---- Text ---------------------------------------------------------- */
+
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+a:visited {
+  color: var(--link-visited);
+}
+
+a:hover,
+a:focus-visible {
+  background: var(--bg-2);
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+p,
+ul,
+ol,
+dl,
+pre,
+table,
+blockquote,
+figure,
+hr {
+  margin: 0 0 1.5em;
+}
+
+/* Headings keep their Markdown markers so the page reads like the source.
+   The markers, like every decorative glyph below, carry empty alternative
+   text (`content: "# " / ""`) so screen readers skip them. The plain form
+   comes first as a fallback for browsers that have light-dark() but not
+   the alternative-text syntax (Firefox 120 to 127). */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: 700;
+  line-height: inherit;
+  margin: 2.25em 0 0.75em;
+}
+
+h1::before { content: "# "; content: "# " / ""; }
+h2::before { content: "## "; content: "## " / ""; }
+h3::before { content: "### "; content: "### " / ""; }
+h4::before { content: "#### "; content: "#### " / ""; }
+h5::before { content: "##### "; content: "##### " / ""; }
+h6::before { content: "###### "; content: "###### " / ""; }
+
+h1::before,
+h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+strong {
+  font-weight: 700;
+}
+
+em {
+  font-style: italic;
+}
+
+hr {
+  border: 0;
+  border-top: 1px dashed var(--rule);
+}
+
+/* Lists: asterisks, hanging. Nested lists indent two columns. */
+ul {
+  list-style: none;
+  padding-left: 2ch;
+}
+
+ul > li::before {
+  content: "* ";
+  content: "* " / "";
+  float: left;
+  margin-left: -2ch;
+  color: var(--muted);
+}
+
+ol {
+  padding-left: 3ch;
+}
+
+li > ul,
+li > ol,
+li > p {
+  margin-bottom: 0;
+}
+
+li > p + ul,
+li > p + ol {
+  margin-top: 0;
+}
+
+/* Quotes carry a "> " prefix like a reply; wrapped lines align under the text. */
+blockquote {
+  margin-left: 0;
+  padding-left: 2ch;
+  color: var(--muted);
+  border-left: 1px solid var(--rule);
+}
+
+blockquote > p {
+  text-indent: -2ch;
+}
+
+blockquote > p::before {
+  content: "> ";
+  content: "> " / "";
+}
+
+blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* Code */
+code,
+kbd,
+samp,
+pre {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+code {
+  background: var(--bg-2);
+  padding: 0 0.25ch;
+}
+
+pre {
+  background: var(--bg-2);
+  border: 1px solid var(--rule);
+  padding: 0.75em 1ch;
+  overflow-x: auto;
+  line-height: 1.4;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+/* Highlighted code (markup.highlight.noClasses = false). Token colours come
+   from chroma.css, generated from Hugo's github and github-dark styles. The
+   surface is the theme's, so a highlighted block and a plain one (no
+   language, no .chroma class) look the same. */
+.chroma {
+  background: var(--bg-2);
+  color: inherit;
+}
+
+/* Hugo wraps every highlighted block in .highlight, so the block margin
+   lives there whether the inside is a bare <pre> (lineNos = false, the
+   default) or a two-column line-number table. */
+.highlight {
+  margin: 0 0 1.5em;
+}
+
+.highlight pre {
+  margin: 0;
+}
+
+/* lineNos = true: Hugo nests a two-cell table (gutter, code) in a div. The
+   div is the box with the border and the horizontal padding; the table and
+   its cells are reset so the content-table rules below do not reach them,
+   and the inner <pre>s keep only vertical padding. The gap between gutter
+   and code is the 1ch margin on the line numbers. */
+.highlight > div {
+  background: var(--bg-2);
+  border: 1px solid var(--rule);
+  padding: 0 1ch;
+  overflow-x: auto;
+}
+
+.lntable,
+.lntd {
+  border: 0;
+  border-spacing: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.lntable pre {
+  border: 0;
+  padding-left: 0;
+  padding-right: 0;
+  overflow: visible;
+}
+
+/* Gutter and highlighted line are the theme's: on the ch grid, not
+   selectable, and at AA contrast on --bg-2. chroma.css carries token
+   colours only, so nothing there competes with these. */
+.chroma .lnt,
+.chroma .ln {
+  color: var(--muted);
+  margin-right: 1ch;
+  padding: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.chroma .hl {
+  display: block;
+  background: light-dark(#fff3b0, #2e2a12);
+}
+
+/* GitHub light's one token under 4.5:1 on --bg-2 (NameBuiltinPseudo). */
+.chroma .bp {
+  color: var(--muted);
+}
+
+/* Generic emphasis tokens (diff and Markdown lexers): the generator keeps
+   colour only, so their weight and slant are set here, the same in both
+   schemes. */
+.chroma .gs {
+  font-weight: 700;
+}
+
+.chroma .ge {
+  font-style: italic;
+}
+
+.chroma .gl {
+  text-decoration: underline;
+}
+
+/* Tables: plain rules, left-aligned text. The render hook wraps each table
+   in .table-wrap, which scrolls so the table keeps display: table and its
+   role for assistive technology. */
+.table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 0 0 1.5em;
+}
+
+.table-wrap table {
+  margin: 0;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.align-right {
+  text-align: right;
+}
+
+th,
+td {
+  border: 1px solid var(--rule);
+  padding: 0.1em 1ch;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--bg-2);
+}
+
+/* Images: fit the column, keep their aspect ratio. */
+img,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+figure {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+figcaption {
+  color: var(--muted);
+}
+
+figcaption::before {
+  content: "^ ";
+  content: "^ " / "";
+}
+
+/* Definition lists in content. */
+dt {
+  font-weight: 700;
+}
+
+dd {
+  margin: 0 0 0.75em 2ch;
+}
+
+mark {
+  background: none;
+  color: var(--mark);
+  font-weight: 700;
+}
+
+/* ---- Page furniture --------------------------------------------------- */
+
+.skip-link {
+  position: absolute;
+  left: -100vw;
+  top: 0;
+}
+
+.skip-link:focus {
+  left: 1rem;
+  background: var(--bg);
+  padding: 0.25em 1ch;
+}
+
+/* Spacing lives on <main> so a site that overrides baseof.html keeps it. */
+main {
+  margin: 2.25em 0 3em;
+}
+
+/* An <h1> on the home page, a <p> elsewhere; no "# " marker either way. */
+.site-title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.site-title::before {
+  content: none;
+}
+
+.site-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.menu {
+  padding: 0;
+  margin: 0;
+}
+
+.menu li {
+  display: inline;
+}
+
+.menu li::before {
+  content: "[";
+  content: "[" / "";
+  float: none;
+  margin: 0;
+}
+
+.menu li::after {
+  content: "] ";
+  content: "] " / "";
+}
+
+.menu li::before,
+.menu li::after {
+  color: var(--muted);
+}
+
+.menu a {
+  text-decoration: none;
+}
+
+.menu a[aria-current] {
+  font-weight: 700;
+}
+
+.menu a:hover,
+.menu a:focus-visible {
+  text-decoration: underline;
+}
+
+/* The message header at the top of a page. */
+.mail-header {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 1ch;
+  margin: 0 0 1.5em;
+  padding-bottom: 0.75em;
+  border-bottom: 1px dashed var(--rule);
+}
+
+.mail-header dt {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.mail-header dt::after {
+  content: ":";
+}
+
+.mail-header dd {
+  margin: 0;
+  min-width: 0;
+}
+
+.mail-header h1 {
+  display: inline;
+  margin: 0;
+}
+
+.mail-header h1::before {
+  content: none;
+}
+
+/* Lists of pages: one line each, like a log. */
+.entries {
+  padding: 0;
+  list-style: none;
+}
+
+.entries > li::before {
+  content: none;
+}
+
+.entry {
+  margin-bottom: 0.25em;
+}
+
+.entry time,
+.entry-section,
+.muted {
+  color: var(--muted);
+}
+
+.entry-summary {
+  margin: 0 0 0.75em 2ch;
+  color: var(--muted);
+}
+
+/* Under a dated entry the summary lines up with the title: ten characters
+   of the default listDateFormat plus a space. */
+.entry time ~ .entry-summary {
+  margin-left: 11ch;
+}
+
+.terms li {
+  display: inline-block;
+  margin-right: 2ch;
+}
+
+.intro > :last-child {
+  margin-bottom: 0;
+}
+
+.intro {
+  margin-bottom: 1.5em;
+}
+
+.pager p,
+.thread ul {
+  margin: 1.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.thread li::before {
+  content: none;
+}
+
+.thread {
+  margin-top: 2.25em;
+  padding-top: 0.75em;
+  border-top: 1px dashed var(--rule);
+}
+
+/* Footer: an email signature. */
+.site-footer,
+body > footer {
+  color: var(--muted);
+}
+
+/* The "-- " delimiter is written by CSS: HTML minifiers eat the trailing space. */
+.sig-sep {
+  margin: 0;
+}
+
+.sig-sep::before {
+  content: "-- ";
+  white-space: pre;
+}
+
+.sig p {
+  margin: 0;
+}
+
+.sig-links {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.sig-links li::before {
+  content: none;
+}
+
+.sig-key {
+  display: inline-block;
+  min-width: 14ch;
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 87.5%;
+  }
+
+  body {
+    padding: 1rem 0.75rem 2rem;
+  }
+
+  .mail-header {
+    grid-template-columns: 1fr;
+  }
+
+  .mail-header dd {
+    margin: 0 0 0.25em 2ch;
+  }
+
+  .entry time ~ .entry-summary {
+    margin-left: 2ch;
+  }
+
+  .sig-key {
+    min-width: 0;
+    margin-right: 1ch;
+  }
+}
+
+@media print {
+  body {
+    max-width: none;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  .site-header nav,
+  .thread,
+  .pager {
+    display: none;
+  }
+}

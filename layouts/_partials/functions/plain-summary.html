@@ -1,0 +1,11 @@
+{{- /*
+  One line of plain text describing a page: its description, else its first
+  paragraphs of prose. Only <p> elements count, so headings, lists and code
+  never leak into previews. The caller truncates the result.
+*/ -}}
+{{- $text := .Description -}}
+{{- if not $text -}}
+  {{- $paragraphs := findRE `(?s)<p[\s>].*?</p>` .Content 3 -}}
+  {{- $text = delimit $paragraphs " " | plainify | htmlUnescape | replaceRE `\s+` " " | strings.TrimSpace -}}
+{{- end -}}
+{{- return $text -}}

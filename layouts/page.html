@@ -1,0 +1,19 @@
+{{ define "main" }}
+<article>
+{{ partial "mail-header.html" . }}
+<div class="body">
+{{ .Content }}
+</div>
+{{ partial "functions/get_hook.html" (dict "hook" "single-after-content" "context" .) }}
+</article>
+{{- /* Hugo orders pages newest first, so .Next is the newer page and .Prev the older. */}}
+{{- $newer := .NextInSection }}{{ $older := .PrevInSection }}
+{{- if or $newer $older }}
+<nav class="thread" aria-label="Neighbouring pages">
+<ul>
+{{- with $newer }}<li><span class="muted">newer:</span> <a href="{{ .RelPermalink }}" rel="prev">{{ .Title }}</a></li>{{ end }}
+{{- with $older }}<li><span class="muted">older:</span> <a href="{{ .RelPermalink }}" rel="next">{{ .Title }}</a></li>{{ end }}
+</ul>
+</nav>
+{{- end }}
+{{ end }}

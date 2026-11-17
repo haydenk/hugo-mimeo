@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Report formatting drift in the TOML files without changing them (for CI)"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT"
+exec taplo fmt --check --diff hugo.toml theme.toml .mise.toml .taplo.toml .rumdl.toml exampleSite/hugo.toml

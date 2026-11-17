@@ -1,0 +1,86 @@
+name: Bug report
+description: Something renders or builds wrong
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Enough detail to reproduce it is the main thing.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is wrong, in a sentence or two.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Content, config and commands that show the problem. A minimal page or config snippet beats a description of one.
+      placeholder: |
+        1. Site config has `...`
+        2. A page with `...`
+        3. Run `hugo` and open `/posts/...`
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: What happens instead. For a visual problem, a screenshot in light and in dark mode.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected component
+      options:
+        - Page templates and partials (layouts/)
+        - Stylesheet, light/dark or code colours (assets/css/)
+        - Plain-text output (.txt)
+        - Image or table render hooks
+        - Example site
+        - Tooling (mise tasks, linters, generator)
+        - CI/CD pipeline
+        - Documentation
+        - Unknown
+    validations:
+      required: true
+
+  - type: input
+    id: hugo
+    attributes:
+      label: Hugo version
+      description: Output of `hugo version`.
+      placeholder: hugo v0.166.0 ... darwin/arm64
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: How the theme is installed
+      options:
+        - Hugo module
+        - Release archive in themes/mimeo
+        - Clone or submodule in themes/mimeo
+        - Other
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Build output
+      description: Relevant lines from `hugo` or `mise run ci`, if any.
+      render: text

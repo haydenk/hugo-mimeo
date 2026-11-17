@@ -1,0 +1,49 @@
+{{- /*
+  Markdown images. A destination that resolves to a page or global resource
+  (bare "diagram.png" in a bundle, or "images/x.png" under assets/) gets
+  width/height so the page does not shift, is served as WebP, and is resized
+  to the text column when wider than it. Other destinations pass through.
+  A standalone image with a title becomes a captioned <figure> (needs
+  markup.goldmark.parser.wrapStandAloneImageWithinParagraph = false).
+*/ -}}
+{{- $u := urls.Parse .Destination -}}
+{{- $src := $u.String -}}
+{{- $res := "" -}}
+{{- if not $u.IsAbs -}}
+  {{- $path := strings.TrimPrefix "./" $u.Path -}}
+  {{- with or (.PageInner.Resources.Get $path) (resources.Get $path) -}}
+    {{- $res = . -}}
+    {{- $src = .RelPermalink -}}
+  {{- end -}}
+{{- end -}}
+{{- $attrs := merge .Attributes (dict "alt" .PlainText "src" $src) -}}
+{{- if ne .Ordinal 0 }}{{ $attrs = merge $attrs (dict "loading" "lazy") }}{{ end -}}
+{{- $subtype := "" -}}
+{{- with $res }}{{ $subtype = .MediaType.SubType }}{{ end -}}
+{{- if in (slice "png" "jpeg" "webp" "tiff" "bmp") $subtype -}}
+  {{- $img := $res -}}
+  {{- if gt $res.Width 800 -}}
+    {{- $img = $res.Process "resize 800x webp q80" -}}
+  {{- else if ne $subtype "webp" -}}
+    {{- $img = $res.Process "webp q80" -}}
+  {{- end -}}
+  {{- $attrs = merge $attrs (dict "src" $img.RelPermalink "width" (string $img.Width) "height" (string $img.Height)) -}}
+{{- else if eq $subtype "gif" -}}
+  {{- $attrs = merge $attrs (dict "width" (string $res.Width) "height" (string $res.Height)) -}}
+{{- else if eq $subtype "svg" -}}
+  {{- with findRESubmatch `viewBox=["']\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)` $res.Content 1 -}}
+    {{- $box := index . 0 -}}
+    {{- $attrs = merge $attrs (dict "width" (index $box 1 | float | math.Round | int | string) "height" (index $box 2 | float | math.Round | int | string)) -}}
+  {{- end -}}
+{{- end -}}
+{{- $figure := and .IsBlock .Title -}}
+{{- if and .Title (not $figure) }}{{ $attrs = merge $attrs (dict "title" .Title) }}{{ end -}}
+{{- if $figure }}<figure>{{ end -}}
+<img
+{{- range $k, $v := $attrs -}}
+  {{- if or $v (eq $k "alt") }}{{ printf ` %s="%s"` $k ($v | transform.HTMLEscape) | safeHTMLAttr }}{{ end -}}
+{{- end -}}>
+{{- if $figure }}
+<figcaption>{{ .Title | markdownify }}</figcaption>
+</figure>
+{{- end -}}

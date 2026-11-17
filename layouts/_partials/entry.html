@@ -1,0 +1,16 @@
+{{- /*
+  One list line, like a log entry: date, title, and the section in brackets
+  when the listing mixes sections. .page is the entry, .list the page listing it.
+*/ -}}
+{{- $p := .page -}}
+{{- $showDate := and (not $p.Date.IsZero) (.list.Param "showListDate" | default true) -}}
+<li class="entry">
+{{- if $showDate }}<time datetime="{{ $p.Date | time.Format "2006-01-02" }}">{{ $p.Date | time.Format (site.Params.listDateFormat | default "2006-01-02") }}</time>  {{ end -}}
+<a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
+{{- if and $p.Section (ne $p.Section .list.Section) }}  <span class="entry-section">[{{ $p.Section }}]</span>{{ end }}
+{{- if site.Params.listSummaries }}
+{{- with partial "functions/plain-summary.html" $p }}
+<p class="entry-summary">{{ . | truncate 160 }}</p>
+{{- end }}
+{{- end }}
+</li>

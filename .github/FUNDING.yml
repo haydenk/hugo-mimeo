@@ -1,0 +1,4 @@
+# Shows a "Sponsor" button on the repository. Each key is a platform; the
+# value is the account there. Add others (ko_fi, patreon, custom URLs) as
+# needed; see https://docs.github.com/sponsors/receiving-sponsorships-through-github-sponsors/displaying-a-sponsor-button-in-your-repository
+github: haydenk

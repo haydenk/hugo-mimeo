@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#MISE description="Package the theme for a release into dist/: a tar.gz and a zip that each unpack to mimeo/, plus checksums"
+#USAGE arg "<version>" help="Release version without the v, e.g. 1.2.0"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT"
+version="${usage_version:?mise sets this from the <version> argument}"
+if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "version must be MAJOR.MINOR.PATCH, got '$version'" >&2
+  exit 1
+fi
+
+# What a site needs when the theme lives in themes/mimeo: templates, assets,
+# archetypes, the theme's own config and metadata, licence and README, and
+# the example site for reference. No developer tooling, no build output.
+include=(archetypes assets layouts static hugo.toml theme.toml go.mod LICENSE README.md exampleSite)
+
+stage="$(mktemp -d)"
+trap 'rm -rf "$stage"' EXIT
+mkdir -p "$stage/mimeo" dist
+for path in "${include[@]}"; do
+  cp -R "$path" "$stage/mimeo/"
+done
+rm -rf "$stage/mimeo/exampleSite/public" "$stage/mimeo/exampleSite/resources" \
+  "$stage/mimeo/exampleSite/.hugo_build.lock"
+# Lets an installer (the mise task in the README, say) see what it has.
+printf '%s\n' "$version" > "$stage/mimeo/VERSION"
+
+tar -C "$stage" -czf "dist/mimeo-$version.tar.gz" mimeo
+(cd "$stage" && zip -qr "$OLDPWD/dist/mimeo-$version.zip" mimeo)
+(cd dist && shasum -a 256 "mimeo-$version.tar.gz" "mimeo-$version.zip" > "mimeo-$version.sha256")
+ls -l dist/

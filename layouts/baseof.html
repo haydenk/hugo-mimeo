@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.Locale | default "en" }}" dir="{{ site.Language.Direction | default "ltr" }}">
+<head>
+{{ partial "head.html" . }}
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+{{ partial "header.html" . }}
+</header>
+<main id="main">
+{{ block "main" . }}{{ end }}
+</main>
+<footer class="site-footer">
+{{ partial "footer.html" . }}
+</footer>
+{{ partial "functions/get_hook.html" (dict "hook" "body-end" "context" .) }}
+</body>
+</html>

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#MISE description="Create or update the repository's GitHub labels from .github/labels.json (needs gh auth)"
+#USAGE flag "--repo <repo>" help="OWNER/REPO to sync; defaults to the repository gh infers for this checkout"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT"
+repo_flag=""
+if [[ -n "${usage_repo:-}" ]]; then
+  repo_flag="--repo=${usage_repo}"
+fi
+
+# --force updates the colour and description of a label that already exists.
+jq -c '.[]' .github/labels.json | while IFS= read -r label; do
+  name="$(jq -r .name <<<"$label")"
+  color="$(jq -r .color <<<"$label")"
+  description="$(jq -r .description <<<"$label")"
+  gh label create "$name" --color "$color" --description "$description" --force ${repo_flag:+"$repo_flag"}
+  echo "synced: $name"
+done

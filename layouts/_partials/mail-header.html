@@ -1,0 +1,25 @@
+{{- /*
+  The header block at the top of every single page, written like a message
+  header. Subject carries the page's <h1>.
+*/ -}}
+<dl class="mail-header">
+<dt>From</dt><dd>{{ .Params.author | default site.Params.authorName | default site.Title }}</dd>
+{{- with .Date }}
+<dt>Date</dt><dd><time datetime="{{ . | time.Format "2006-01-02T15:04:05-07:00" }}">{{ . | time.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</time></dd>
+{{- end }}
+<dt>Subject</dt><dd><h1>{{ with .Section }}[{{ . }}] {{ end }}{{ .Title }}</h1></dd>
+{{- if .Param "showTags" | default true }}
+{{- with .GetTerms "tags" }}
+<dt>Tags</dt><dd>{{ range $i, $t := . }}{{ if $i }}, {{ end }}<a href="{{ $t.RelPermalink }}">{{ $t.LinkTitle }}</a>{{ end }}</dd>
+{{- end }}
+{{- end }}
+{{- with .GetTerms "series" }}
+<dt>Series</dt><dd>{{ range $i, $t := . }}{{ if $i }}, {{ end }}<a href="{{ $t.RelPermalink }}">{{ $t.LinkTitle }}</a>{{ end }}</dd>
+{{- end }}
+{{- if .Param "readTime" }}
+<dt>X-Read-Time</dt><dd>{{ .ReadingTime }} min</dd>
+{{- end }}
+{{- with .OutputFormats.Get "txt" }}
+<dt>X-Plain-Text</dt><dd><a href="{{ .RelPermalink }}">{{ .RelPermalink }}</a></dd>
+{{- end }}
+</dl>

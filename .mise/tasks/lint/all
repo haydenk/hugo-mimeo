@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Run every linter"
+#MISE depends=["lint:markdown", "lint:toml", "lint:shell", "lint:actions"]
+set -euo pipefail
+
+echo "All linters passed"

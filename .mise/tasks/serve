@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#MISE description="Serve exampleSite on http://localhost:1313 with live reload"
+set -euo pipefail
+
+root="$MISE_PROJECT_ROOT"
+exec hugo server --source "$root/exampleSite" \
+  --themesDir "$(dirname "$root")" --theme "$(basename "$root")" \
+  --bind 127.0.0.1 --port 1313 --buildDrafts --disableFastRender --noBuildLock "$@"

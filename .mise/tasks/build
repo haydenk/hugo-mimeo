@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#MISE description="Build exampleSite with the theme into exampleSite/public (any Hugo warning fails the build)"
+#MISE depends=["clean"]
+set -euo pipefail
+
+# The theme is the repository root: hand Hugo its parent as the themes
+# directory and the directory name as the theme.
+root="$MISE_PROJECT_ROOT"
+exec hugo --source "$root/exampleSite" \
+  --themesDir "$(dirname "$root")" --theme "$(basename "$root")" \
+  --destination "$root/exampleSite/public" \
+  --minify --panicOnWarning --printPathWarnings --printUnusedTemplates "$@"

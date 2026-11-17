@@ -1,0 +1,20 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+{{ .Content }}
+{{- if eq .Kind "taxonomy" }}
+{{- /* A list of terms with counts: "grace (12)". */}}
+<ul class="entries terms">
+{{- range .Pages }}
+<li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a> <span class="muted">({{ len .Pages }})</span></li>
+{{- end }}
+</ul>
+{{- else }}
+{{- $paginator := .Paginate .Pages }}
+<ul class="entries">
+{{- range $paginator.Pages }}
+{{ partial "entry.html" (dict "page" . "list" $) }}
+{{- end }}
+</ul>
+{{ partial "pagination.html" . }}
+{{- end }}
+{{ end }}

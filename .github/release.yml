@@ -1,0 +1,27 @@
+# How `gh release create --generate-notes` groups merged pull requests. The
+# labels are the ones in .github/labels.json; the labeler applies the area
+# ones, people apply the rest.
+changelog:
+  exclude:
+    labels:
+      - dependencies
+  categories:
+    - title: Breaking changes
+      labels:
+        - breaking change
+    - title: New
+      labels:
+        - enhancement
+    - title: Fixed
+      labels:
+        - bug
+    - title: Documentation
+      labels:
+        - documentation
+    - title: Tooling and CI
+      labels:
+        - "area: tooling"
+        - "area: ci"
+    - title: Other changes
+      labels:
+        - "*"

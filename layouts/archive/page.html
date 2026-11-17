@@ -1,0 +1,23 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+{{ .Content }}
+{{- /* Every regular page except archive pages themselves, newest month first.
+  Pages without a date would group under the year 1, so they get their own list. */}}
+{{- $pages := where site.RegularPages "Type" "ne" "archive" }}
+{{- range (where $pages "Date.IsZero" false).GroupByDate "2006-01" }}
+<h2>{{ (index .Pages 0).Date | time.Format "January 2006" }}</h2>
+<ul class="entries">
+{{- range .Pages }}
+{{ partial "entry.html" (dict "page" . "list" $) }}
+{{- end }}
+</ul>
+{{- end }}
+{{- with where $pages "Date.IsZero" true }}
+<h2>Undated</h2>
+<ul class="entries">
+{{- range . }}
+{{ partial "entry.html" (dict "page" . "list" $) }}
+{{- end }}
+</ul>
+{{- end }}
+{{ end }}

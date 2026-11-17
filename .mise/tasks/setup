@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#MISE description="Install the pinned tools (the theme has no other dependencies)"
+#USAGE flag "--frozen" help="Accepted for CI parity; there is no lockfile to freeze"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT"
+mise install
+hugo version
+rumdl --version
+taplo --version
+lychee --version
+shellcheck --version | head -2
+actionlint --version
+gh --version | head -1
+jq --version

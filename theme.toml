@@ -1,0 +1,20 @@
+name = "Mimeo"
+license = "AGPL-3.0"
+licenselink = "https://github.com/haydenk/mimeo/blob/main/LICENSE"
+description = "A plain-text blog theme: every page reads like a patch or an email in a monospaced 80-column file. HTML only for links and images, no JavaScript, light and dark from the system preference."
+homepage = "https://github.com/haydenk/mimeo"
+demosite = "https://haydenk.github.io/mimeo/"
+tags = [
+  "blog",
+  "minimal",
+  "monospace",
+  "plain text",
+  "dark mode",
+  "no javascript",
+]
+features = ["plain text output", "light-dark css", "series taxonomy", "hooks"]
+min_version = "0.158.0"
+
+[author]
+  name = "Hayden King"
+  homepage = "https://www.haydenk.com"

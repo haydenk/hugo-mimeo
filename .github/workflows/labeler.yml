@@ -1,0 +1,21 @@
+name: Label pull requests
+
+# Applies area labels from .github/labeler.yml by the files a pull request
+# touches. pull_request_target runs with the base branch's configuration and
+# a write token, which is why this workflow checks out nothing.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label:
+    name: Apply area labels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
+        with:
+          sync-labels: true

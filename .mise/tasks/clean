@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#MISE description="Remove everything the tasks generate: the example site's build output and caches, release archives, and the rumdl cache"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT"
+rm -rf exampleSite/public exampleSite/resources exampleSite/.hugo_build.lock \
+  dist .rumdl_cache
+echo "Cleaned"

@@ -1,0 +1,19 @@
+{{ partial "functions/get_hook.html" (dict "hook" "footer-start" "context" .) }}
+{{- /* An email signature: the "-- " delimiter, then a line per link. */}}
+<p class="sig-sep" aria-hidden="true"></p>
+<div class="sig">
+{{- with site.Params.footerContent }}
+{{ . | markdownify }}
+{{- else }}
+<p>&copy; {{ now.Year }} {{ site.Params.authorName | default site.Title }}</p>
+{{- end }}
+{{- with site.Params.social }}
+<ul class="sig-links">
+{{- range . }}
+{{- /* A site-root link ("/index.xml") gets the baseURL path prepended, for
+  sites served under a subpath; relURL leaves absolute URLs alone. */}}
+<li><span class="sig-key">{{ .name }}</span> <a href="{{ strings.TrimPrefix "/" .url | relURL }}"{{ with .rel }} rel="{{ . }}"{{ end }}{{ with .title }} title="{{ . }}"{{ end }}>{{ .url }}</a></li>
+{{- end }}
+</ul>
+{{- end }}
+</div>

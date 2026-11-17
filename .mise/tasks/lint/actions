@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#MISE description="Lint the GitHub Actions workflows with actionlint (shellcheck covers their run: steps)"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT"
+# Files are named explicitly: actionlint's auto-discovery needs a git
+# checkout, and a fresh copy of the theme may not be one.
+exec actionlint .github/workflows/*.yml "$@"

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#MISE description="Set the GitHub repository's description, homepage and topics from theme.toml (needs gh auth)"
+#USAGE flag "--repo <repo>" help="OWNER/REPO to update; defaults to the repository gh infers for this checkout"
+#USAGE flag "--dry-run" help="Print the gh command instead of running it"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT"
+
+# theme.toml is the single source: its description and demosite become the
+# repository description and homepage; its tags, hyphenated, plus the fixed
+# GitHub-side ones below become the topics.
+description="$(taplo get -f theme.toml description)"
+homepage="$(taplo get -f theme.toml demosite)"
+args=(--description "$description" --homepage "$homepage")
+for topic in hugo hugo-theme static-site; do
+  args+=(--add-topic "$topic")
+done
+while IFS= read -r tag; do
+  args+=(--add-topic "${tag// /-}")
+done < <(taplo get -f theme.toml tags)
+
+cmd=(gh repo edit ${usage_repo:+"$usage_repo"} "${args[@]}")
+if [[ "${usage_dry_run:-}" == "true" ]]; then
+  printf '%q ' "${cmd[@]}"
+  echo
+  exit 0
+fi
+"${cmd[@]}"
+echo "Repository description, homepage and topics set"

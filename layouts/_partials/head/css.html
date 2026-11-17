@@ -1,0 +1,15 @@
+{{- /*
+  The generated Chroma colours, the theme stylesheet, then the site's
+  assets/css/custom.css when it exists. Chroma goes first so mimeo.css can
+  override its code-block surface. Inlined by default (one request, no
+  render-blocking fetch); params.inlineCSS = false links it fingerprinted.
+*/ -}}
+{{- $css := slice (resources.Get "css/chroma.css") (resources.Get "css/mimeo.css") -}}
+{{- with resources.Get "css/custom.css" }}{{ $css = $css | append . }}{{ end -}}
+{{- $style := $css | resources.Concat "css/style.css" | minify -}}
+{{- if eq (site.Params.inlineCSS | default true) false -}}
+  {{- $style = $style | fingerprint }}
+<link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}">
+{{- else }}
+<style>{{ $style.Content | safeCSS }}</style>
+{{- end }}

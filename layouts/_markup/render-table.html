@@ -1,0 +1,32 @@
+{{- /*
+  Markdown tables, wrapped in a div that scrolls sideways. The table itself
+  keeps display: table so assistive technology still reads it as one;
+  overflow on the table element would need display: block, which drops
+  that role in some browsers. Column alignment is a class, not an inline
+  style, so a strict style-src CSP holds.
+*/ -}}
+<div class="table-wrap">
+<table
+{{- range $k, $v := .Attributes }}
+  {{- if $v }}{{ printf ` %s="%s"` $k ($v | transform.HTMLEscape) | safeHTMLAttr }}{{ end }}
+{{- end }}>
+<thead>
+{{- range .THead }}
+<tr>
+{{- range . }}
+<th{{ with .Alignment }} class="align-{{ . }}"{{ end }}>{{ .Text }}</th>
+{{- end }}
+</tr>
+{{- end }}
+</thead>
+<tbody>
+{{- range .TBody }}
+<tr>
+{{- range . }}
+<td{{ with .Alignment }} class="align-{{ . }}"{{ end }}>{{ .Text }}</td>
+{{- end }}
+</tr>
+{{- end }}
+</tbody>
+</table>
+</div>

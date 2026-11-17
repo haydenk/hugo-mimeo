@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Format the TOML files and auto-fix Markdown lint findings"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT"
+taplo fmt hugo.toml theme.toml .mise.toml .taplo.toml .rumdl.toml exampleSite/hugo.toml
+rumdl check --fix .

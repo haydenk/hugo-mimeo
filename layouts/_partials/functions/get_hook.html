@@ -1,0 +1,12 @@
+{{- /*
+  Extension points: a site customizes the theme by adding
+  layouts/_partials/hooks/<hook>.html instead of overriding a template.
+  A hook that does not exist renders nothing.
+
+  Hooks: head-start, head-end, single-after-content, footer-start, body-end.
+  (Same names as the Emend theme, so a site's hooks carry over.)
+*/ -}}
+{{- $name := printf "hooks/%s.html" .hook -}}
+{{- if templates.Exists (printf "_partials/%s" $name) -}}
+  {{- partial $name .context -}}
+{{- end -}}

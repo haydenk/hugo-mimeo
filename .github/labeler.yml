@@ -1,0 +1,29 @@
+# Path-to-label rules for actions/labeler. Label names must exist in
+# .github/labels.json.
+"area: templates":
+  - changed-files:
+      - any-glob-to-any-file: ["layouts/**"]
+
+"area: styles":
+  - changed-files:
+      - any-glob-to-any-file: ["assets/**", ".mise/tasks/gen/chroma"]
+
+"area: plain text":
+  - changed-files:
+      - any-glob-to-any-file: ["layouts/page.txt"]
+
+"area: example site":
+  - changed-files:
+      - any-glob-to-any-file: ["exampleSite/**"]
+
+"area: tooling":
+  - changed-files:
+      - any-glob-to-any-file: [".mise.toml", ".mise/**", ".taplo.toml", ".rumdl.toml"]
+
+"area: ci":
+  - changed-files:
+      - any-glob-to-any-file: [".github/**"]
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: ["README.md", "LICENSE", "theme.toml", "archetypes/**"]

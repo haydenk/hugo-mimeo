@@ -1,0 +1,9 @@
+{{- /* Static paths use relURL so icons also work on subpath deployments. */ -}}
+<link rel="icon" href="{{ "favicon.ico" | relURL }}" sizes="16x16 32x32 48x48 256x256" type="image/x-icon">
+{{- range slice 16 32 48 96 }}
+<link rel="icon" href="{{ printf "favicon-%dx%d.png" . . | relURL }}" sizes="{{ . }}x{{ . }}" type="image/png">
+{{- end }}
+<link rel="apple-touch-icon" href="{{ "apple-touch-icon.png" | relURL }}" sizes="180x180">
+{{- range slice 192 512 }}
+<link rel="icon" href="{{ printf "icon-%d.png" . | relURL }}" sizes="{{ . }}x{{ . }}" type="image/png">
+{{- end }}

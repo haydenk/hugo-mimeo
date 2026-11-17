@@ -1,0 +1,57 @@
+name: Feature request
+description: Propose a feature, param or change in behaviour
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion. The theme stays small on purpose, so the
+        why matters as much as the what.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: The feature in a sentence or two.
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What does it make possible, or what does it stop you doing today? Can a hook or `custom.css` already do it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How you would like it to work. A param name, a hook, an example of the rendered result.
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: |
+        - [ ] ...
+        - [ ] Shown in the example site
+        - [ ] Documented in the README
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Relevant component
+      options:
+        - Page templates and partials (layouts/)
+        - Stylesheet, light/dark or code colours (assets/css/)
+        - Plain-text output (.txt)
+        - Image or table render hooks
+        - Example site
+        - Tooling (mise tasks, linters, generator)
+        - CI/CD pipeline
+        - Documentation
+        - New component
+    validations:
+      required: true

@@ -1,0 +1,90 @@
+name: Release
+
+# Trunk-based releases. Cut a branch named release/MAJOR.MINOR.PATCH from
+# master and push it. This workflow then:
+#   1. runs the full CI against that commit,
+#   2. packages the theme, tags the commit vMAJOR.MINOR.PATCH and publishes a
+#      GitHub Release with the archives and generated notes,
+#   3. builds the example site and deploys it to GitHub Pages as the demo.
+# A fix after a release is a new release/x.y.z branch; re-pushing an old one
+# stops at step 1 because its tag already exists. The repository's Pages
+# source must be set to "GitHub Actions" once, in Settings > Pages.
+on:
+  push:
+    branches: ["release/[0-9]+.[0-9]+.[0-9]+"]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify release candidate
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Read the version from the branch name
+        id: version
+        run: |
+          version="${GITHUB_REF_NAME#release/}"
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null 2>&1; then
+            echo "::error::tag v$version already exists; cut a new release/x.y.z branch instead of re-pushing this one"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+      - name: Install pinned tools
+        run: mise run setup --frozen
+      - name: Run CI checks
+        run: mise run ci
+
+  publish:
+    name: Tag and publish v${{ needs.verify.outputs.version }}
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.verify.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+      - name: Package the theme
+        run: mise run package "$VERSION"
+      - name: Create the tag and the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v$VERSION" dist/* \
+            --target "$GITHUB_SHA" \
+            --title "Mimeo v$VERSION" \
+            --generate-notes
+
+  pages:
+    name: Deploy the demo to GitHub Pages
+    needs: publish
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+        id: pages
+      - name: Build the example site for its Pages URL
+        env:
+          BASE_URL: ${{ steps.pages.outputs.base_url }}
+        run: mise run build -- --baseURL "$BASE_URL/"
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: exampleSite/public
+      - uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        id: deploy

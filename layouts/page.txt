@@ -1,0 +1,13 @@
+{{- /* The plain-text copy of a page: the same header, then the raw Markdown. */ -}}
+From: {{ .Params.author | default site.Params.authorName | default site.Title }}
+{{ with .Date -}}Date: {{ . | time.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}
+{{ end -}}
+Subject: {{ with .Section }}[{{ . }}] {{ end }}{{ .Title }}
+{{ with .GetTerms "tags" -}}Tags: {{ range $i, $t := . }}{{ if $i }}, {{ end }}{{ $t.LinkTitle }}{{ end }}
+{{ end -}}
+{{ with .GetTerms "series" -}}Series: {{ range $i, $t := . }}{{ if $i }}, {{ end }}{{ $t.LinkTitle }}{{ end }}
+{{ end -}}
+Link: {{ .Permalink }}
+Content-Type: text/markdown; charset=utf-8
+
+{{ .RawContent | strings.TrimSpace }}

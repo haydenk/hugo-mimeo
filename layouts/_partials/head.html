@@ -1,0 +1,19 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{{- /* Lets the browser paint the right canvas before the stylesheet is parsed. */}}
+<meta name="color-scheme" content="light dark">
+{{ partial "functions/get_hook.html" (dict "hook" "head-start" "context" .) }}
+<title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ printf "%s | %s" .Title site.Title }}{{ end }}</title>
+{{- $description := or (partial "functions/plain-summary.html" .) site.Params.description "" | truncate 160 }}
+{{ with $description }}<meta name="description" content="{{ . }}">{{ end }}
+<link rel="canonical" href="{{ .Permalink }}">
+{{ partial "head/favicon.html" . }}
+{{- with .OutputFormats.Get "rss" }}
+<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ site.Title }}">
+{{- end }}
+{{- with .OutputFormats.Get "txt" }}
+<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="Plain text">
+{{- end }}
+{{ partial "opengraph.html" (dict "page" . "description" $description) }}
+{{ partialCached "head/css.html" . }}
+{{ partial "functions/get_hook.html" (dict "hook" "head-end" "context" .) }}

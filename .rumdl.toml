@@ -1,0 +1,16 @@
+# Markdown lint rules for rumdl (`mise run lint:markdown`). rumdl implements
+# markdownlint's rule set; this file was converted from a .markdownlint.json
+# with `rumdl import` and then annotated.
+[global]
+  # MD013 line length: prose is wrapped by hand at 80 columns but tables and
+  # links run long. MD033 inline HTML: the README uses it. MD041 first line
+  # must be a heading: content files start with front matter. MD057 relative
+  # links must exist: the demo links to its own .txt twin, which exists only
+  # after a build; lychee checks it then.
+  disable = ["MD013", "MD033", "MD041", "MD057"]
+  # Nine files lint in milliseconds; no cache directory in the tree.
+  cache = false
+
+[MD024]
+  # Duplicate headings are fine under different parents, not as siblings.
+  siblings-only = true

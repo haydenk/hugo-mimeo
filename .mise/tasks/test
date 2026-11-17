@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+#MISE description="Build exampleSite, then check its links and the theme's invariants (no scripts, alt text, quoting, plain-text twins, hooks, image processing)"
+#MISE depends=["build"]
+#MISE alias="t"
+set -euo pipefail
+
+public="$MISE_PROJECT_ROOT/exampleSite/public"
+failed=0
+
+fail() {
+  echo "FAIL: $*" >&2
+  failed=1
+}
+
+# Internal links and image paths resolve. Offline: no network from tests.
+lychee --offline --no-progress --root-dir "$public" "$public/**/*.html"
+
+# The theme ships no JavaScript, so a strict CSP needs no script hashes.
+if grep -rl '<script' "$public" --include='*.html' >/dev/null; then
+  fail "a page contains a <script> element:"
+  grep -rl '<script' "$public" --include='*.html' >&2
+fi
+
+# Every image has an alt attribute.
+if grep -rhoE '<img[^>]*>' "$public" --include='*.html' | grep -v 'alt=' >/dev/null; then
+  fail "an <img> has no alt attribute:"
+  grep -rhoE '<img[^>]*>' "$public" --include='*.html' | grep -v 'alt=' >&2
+fi
+
+# No tag carries a Go-style escape: a `\"` or `\\` inside an attribute means
+# a template quoted with %q instead of HTML-escaping. The demo has a title
+# with quotes and an alt with a backslash to provoke it.
+if grep -rhoE '<[a-zA-Z][^>]*>' "$public" --include='*.html' | grep -E '\\["\\]' >/dev/null; then
+  fail "a tag contains a backslash-escaped quote or backslash:"
+  grep -rhoE '<[a-zA-Z][^>]*>' "$public" --include='*.html' | grep -E '\\["\\]' >&2
+fi
+
+# The three site-config lines the README's Install section requires are in
+# force. Each has a visible consequence in the built demo. (A missing
+# [outputs] block already fails the build step, because --panicOnWarning
+# trips on page.txt being unused; the X-Plain-Text check below covers a
+# site whose [outputs] keeps the format but drops it from `page`.)
+while IFS= read -r html; do
+  grep -q 'X-Plain-Text' "$html" \
+    || fail "$html has no X-Plain-Text line; is [outputs] page = ['html', 'txt'] set?"
+done < <(grep -rl '<article' "$public" --include='*.html')
+grep -rqE 'class="?chroma' "$public" --include='*.html' \
+  || fail "no Chroma classes in any page; is markup.highlight.noClasses = false set?"
+grep -rq '<figure>' "$public" --include='*.html' \
+  || fail "no <figure> in any page; is wrapStandAloneImageWithinParagraph = false set?"
+
+# The archive page: undated pages get their own group, and its front matter
+# opts out of the plain-text twin, so none is written.
+grep -q 'Undated' "$public/archive/index.html" \
+  || fail "archive page has no Undated group for the undated demo note"
+[ ! -e "$public/archive.txt" ] \
+  || fail "archive.txt was written; the archive page should set outputs = ['html']"
+
+# Every HTML page that advertises a plain-text twin has one on disk.
+while IFS= read -r html; do
+  txt="$(grep -oE '<link [^>]*type="?text/plain"?[^>]*>' "$html" \
+    | grep -oE 'href="?[^ >"]+' | head -1 | sed -E 's|^href="?||; s|^https?://[^/]+||' || true)"
+  if [ -n "$txt" ] && [ ! -f "$public$txt" ]; then
+    fail "$html links to $txt, which was not written"
+  fi
+done < <(find "$public" -name '*.html')
+
+# The render hooks ran: the demo PNG became a WebP, and the demo's head-end
+# hook partial was called.
+find "$public" -name '*.webp' | grep -q . \
+  || fail "no .webp was written; the image render hook did not process the demo PNG"
+grep -qE 'name="?demo-hook' "$public/index.html" \
+  || fail "the head-end hook partial did not render"
+
+if [ "$failed" -ne 0 ]; then
+  exit 1
+fi
+echo "Tests passed"

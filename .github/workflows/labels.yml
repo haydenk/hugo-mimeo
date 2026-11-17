@@ -1,0 +1,28 @@
+name: Sync labels
+
+# Keeps the repository's labels equal to .github/labels.json, the single
+# source for the names the issue forms, the labeler and dependabot use.
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/labels.json
+      - .github/workflows/labels.yml
+      - .mise/tasks/labels/sync
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sync:
+    name: Create or update labels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+      - name: Sync labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: mise run labels:sync

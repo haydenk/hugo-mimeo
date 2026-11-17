@@ -1,0 +1,72 @@
+baseURL = 'https://example.org/'
+title = 'mimeo'
+theme = 'mimeo'
+enableRobotsTXT = true
+
+[params]
+  authorName = 'Jane Doe'
+  description = 'A demo of the Mimeo theme: a blog that reads like a text file.'
+  images = ['images/mimeo-demo-og.png']
+  imageAlt = 'Mimeo live demo: a blog that reads like a text file, with a blue m on duplicated paper sheets.'
+  homeIntroContent = "Notes, patches and the occasional essay. Every page here also exists as a `.txt` file; add the extension to any URL."
+  homeCollection = ['posts', 'notes']
+  homeCollectionTitle = 'Latest'
+  listSummaries = true
+  readTime = true
+  showTags = true
+
+  [[params.social]]
+    name = 'github'
+    title = 'GitHub'
+    url = 'https://github.com/haydenk/mimeo'
+
+  [[params.social]]
+    name = 'rss'
+    title = 'RSS feed'
+    url = '/index.xml'
+
+[menus]
+  [[menus.main]]
+    name = 'posts'
+    pageRef = '/posts'
+    weight = 10
+  [[menus.main]]
+    name = 'notes'
+    pageRef = '/notes'
+    weight = 20
+  [[menus.main]]
+    name = 'tags'
+    pageRef = '/tags'
+    weight = 30
+  [[menus.main]]
+    name = 'series'
+    pageRef = '/series'
+    weight = 40
+  [[menus.main]]
+    name = 'archive'
+    pageRef = '/archive'
+    weight = 90
+
+[taxonomies]
+  tag = 'tags'
+  series = 'series'
+
+[permalinks]
+  [permalinks.page]
+    posts = '/posts/:year/:month/:day/:slug/'
+    notes = '/notes/:slug/'
+
+[outputs]
+  home = ['html', 'rss']
+  page = ['html', 'txt']
+  section = ['html']
+  taxonomy = ['html']
+  term = ['html']
+
+[markup]
+  [markup.highlight]
+    noClasses = false
+    lineNos = true
+  [markup.goldmark]
+    [markup.goldmark.parser]
+      wrapStandAloneImageWithinParagraph = false
