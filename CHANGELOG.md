@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [1.1.0] - 2026-11-16
+
+### Changed
+
+- The repository is `github.com/haydenk/mimeo` again, so the Hugo module
+  path is too. `v1.0.0` declared `github.com/haydenk/hugo-mimeo`; a site
+  that imported that path should change the import to move past it. Git
+  checkouts and release archives are unaffected, and the old name
+  redirects.
+
 ## [1.0.0] - 2026-11-16
 
 First release.
@@ -63,5 +73,6 @@ First release.
   check, GitHub Actions for CI and releases, release archives that unpack
   to `themes/mimeo`, and a demo deployed to GitHub Pages on each release.
 
-[Unreleased]: https://github.com/haydenk/mimeo/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/haydenk/mimeo/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/haydenk/mimeo/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/haydenk/mimeo/releases/tag/v1.0.0
