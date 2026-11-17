@@ -1,38 +1,63 @@
 name: Release
 
-# Trunk-based releases. Cut a branch named release/MAJOR.MINOR.PATCH from
-# master and push it. This workflow then:
-#   1. runs the full CI against that commit,
-#   2. packages the theme, tags the commit vMAJOR.MINOR.PATCH and publishes a
-#      GitHub Release with the archives and generated notes,
-#   3. builds the example site and deploys it to GitHub Pages as the demo.
-# A fix after a release is a new release/x.y.z branch; re-pushing an old one
-# stops at step 1 because its tag already exists. The repository's Pages
-# source must be set to "GitHub Actions" once, in Settings > Pages.
+# Trunk-based releases, cut by merging to master. On a release branch,
+# rename [Unreleased] in CHANGELOG.md to the version, open a pull request,
+# merge it. Every push to master then asks one question: does the newest
+# "## [x.y.z]" heading in CHANGELOG.md have a tag yet? If not, this is a
+# release: run the full CI, package the theme, tag vx.y.z, publish a GitHub
+# Release with that changelog section as its notes, and deploy the example
+# site to GitHub Pages. If the tag exists, the merge was ordinary and the
+# workflow stops after the first job.
+#
+# The github-pages environment only accepts deployments from master, which
+# is one reason the deploy lives here and not on the release branch. A
+# manual run redeploys the demo without releasing.
 on:
   push:
-    branches: ["release/[0-9]+.[0-9]+.[0-9]+"]
+    branches: [master]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
-  verify:
-    name: Verify release candidate
+  detect:
+    name: Is this merge a release?
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
+      release: ${{ steps.version.outputs.release }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Read the version from the branch name
+      - name: Compare the changelog's newest version with the tags
         id: version
         run: |
-          version="${GITHUB_REF_NAME#release/}"
-          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null 2>&1; then
-            echo "::error::tag v$version already exists; cut a new release/x.y.z branch instead of re-pushing this one"
-            exit 1
+          version="$(grep -oEm1 '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | tr -d '#[] ')"
+          if [ -z "$version" ]; then
+            echo "CHANGELOG.md has no released version yet; nothing to do"
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null 2>&1; then
+            echo "v$version is already tagged; not a release"
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "v$version is new; releasing"
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  verify:
+    name: Verify v${{ needs.detect.outputs.version }}
+    needs: detect
+    if: needs.detect.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
       - name: Install pinned tools
         run: mise run setup --frozen
@@ -40,18 +65,33 @@ jobs:
         run: mise run ci
 
   publish:
-    name: Tag and publish v${{ needs.verify.outputs.version }}
-    needs: verify
+    name: Tag and publish v${{ needs.detect.outputs.version }}
+    needs: [detect, verify]
+    if: needs.detect.outputs.release == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     env:
-      VERSION: ${{ needs.verify.outputs.version }}
+      VERSION: ${{ needs.detect.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
       - name: Package the theme
         run: mise run package "$VERSION"
+      - name: Release notes from the changelog
+        # The [VERSION] section of CHANGELOG.md, up to the next version
+        # heading or the link references. The generated list of merged pull
+        # requests follows it.
+        run: |
+          awk -v ver="$VERSION" '
+            /^## \[/ { if (p) exit; if (index($0, "## [" ver "]") == 1) p = 1; next }
+            /^\[[^]]+\]: / { if (p) exit }
+            p { print }
+          ' CHANGELOG.md > release-notes.md
+          if ! grep -q '[^[:space:]]' release-notes.md; then
+            echo "::error::the [$VERSION] section of CHANGELOG.md is empty"
+            exit 1
+          fi
       - name: Create the tag and the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -59,11 +99,15 @@ jobs:
           gh release create "v$VERSION" dist/* \
             --target "$GITHUB_SHA" \
             --title "Mimeo v$VERSION" \
+            --notes-file release-notes.md \
             --generate-notes
 
   pages:
     name: Deploy the demo to GitHub Pages
-    needs: publish
+    needs: [detect, publish]
+    # After a release, or on a manual run; a manual run skips publish, so
+    # accept its "skipped" result.
+    if: always() && (needs.detect.outputs.release == 'true' && needs.publish.result == 'success' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -71,9 +115,6 @@ jobs:
     permissions:
       pages: write
       id-token: write
-    concurrency:
-      group: pages
-      cancel-in-progress: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9

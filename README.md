@@ -270,19 +270,30 @@ they touch (`.github/labeler.yml`); the label set itself lives in
 `.github/labels.json` and `mise run labels:sync` (or the Sync labels
 workflow, on push) creates or updates it on GitHub.
 
-To release, cut a branch from `master` named for the version and push it:
+To release, cut a branch from `master`, rename `[Unreleased]` in
+`CHANGELOG.md` to the version with today's date, start a fresh
+`[Unreleased]` above it, and open a pull request:
 
 ```sh
-git switch -c release/1.2.0 master && git push -u origin release/1.2.0
+git switch -c release/1.2.0 master
+# edit CHANGELOG.md, commit
+git push -u origin release/1.2.0 && gh pr create --base master --title "Release 1.2.0"
 ```
 
-`.github/workflows/release.yml` then runs the full CI against that commit,
-runs `mise run package`, tags the commit `v1.2.0`, publishes a GitHub
-Release with the archives, checksums and generated notes, and builds the
-example site for its GitHub Pages URL and deploys it there. That deploy is
-the demo at <https://haydenk.github.io/hugo-mimeo/>; it only moves on a
-release. A fix after a release is a new `release/1.2.1` branch, not a
-second push to the old one. One-time setup on GitHub after creating the
+Nothing is tagged while the pull request is open; CI runs on it like any
+other. Merging it is the release. `.github/workflows/release.yml` runs on
+every push to `master` and compares the newest `## [x.y.z]` heading in
+`CHANGELOG.md` with the tags: if `v1.2.0` does not exist yet, it runs the
+full CI, runs `mise run package`, tags the merge commit `v1.2.0`,
+publishes a GitHub Release whose notes are that changelog section
+followed by the generated list of merged pull requests, attaches the
+archives and checksums, and builds the example site for its GitHub Pages
+URL and deploys it there. If the tag already exists, the merge was an
+ordinary one and the workflow stops. The deploy is the demo at
+<https://haydenk.github.io/hugo-mimeo/>; it moves on a release, or on a
+manual run of the workflow. The `github-pages` environment only accepts
+deployments from `master`, which is why the deploy belongs to the merge
+and not to the release branch. One-time setup on GitHub after creating the
 repository: `mise run repo:sync` (description, homepage and topics from
 `theme.toml`), `mise run labels:sync`, and Settings > Pages > Source:
 GitHub Actions. Dependabot opens weekly pull requests for the SHA-pinned

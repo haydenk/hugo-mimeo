@@ -26,6 +26,8 @@ diff shows what changed; say why.
 - [ ] A visible change is shown in the example site, and the test task
       asserts it where it can
 - [ ] README updated for any new or changed param, hook or required config
+- [ ] A line under `[Unreleased]` in `CHANGELOG.md` for anything a site
+      would notice
 - [ ] `mise run gen:chroma` rerun if the Hugo pin changed
 - [ ] No build output or generated files committed beyond `assets/css/chroma.css`
 
