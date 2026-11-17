@@ -32,6 +32,10 @@ jobs:
             echo "::error::tag v$version already exists; cut a new release/x.y.z branch instead of re-pushing this one"
             exit 1
           fi
+          if ! grep -qE "^## \[$version\] - [0-9]{4}-[0-9]{2}-[0-9]{2}$" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## [$version] - YYYY-MM-DD' section; rename [Unreleased] before pushing the release branch"
+            exit 1
+          fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
       - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
       - name: Install pinned tools
@@ -52,6 +56,19 @@ jobs:
       - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
       - name: Package the theme
         run: mise run package "$VERSION"
+      - name: Release notes from the changelog
+        # The [VERSION] section of CHANGELOG.md, up to the next version
+        # heading. The generated list of merged pull requests follows it.
+        run: |
+          awk -v ver="$VERSION" '
+            /^## \[/ { if (p) exit; if (index($0, "## [" ver "]") == 1) p = 1; next }
+            /^\[[^]]+\]: / { if (p) exit }
+            p { print }
+          ' CHANGELOG.md > release-notes.md
+          if ! grep -q '[^[:space:]]' release-notes.md; then
+            echo "::error::the [$VERSION] section of CHANGELOG.md is empty"
+            exit 1
+          fi
       - name: Create the tag and the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -59,6 +76,7 @@ jobs:
           gh release create "v$VERSION" dist/* \
             --target "$GITHUB_SHA" \
             --title "Mimeo v$VERSION" \
+            --notes-file release-notes.md \
             --generate-notes
 
   pages:

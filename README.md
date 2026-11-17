@@ -270,15 +270,19 @@ they touch (`.github/labeler.yml`); the label set itself lives in
 `.github/labels.json` and `mise run labels:sync` (or the Sync labels
 workflow, on push) creates or updates it on GitHub.
 
-To release, cut a branch from `master` named for the version and push it:
+To release, rename `[Unreleased]` in `CHANGELOG.md` to the version with
+today's date and start a fresh `[Unreleased]` above it, then cut a branch
+from `master` named for the version and push it:
 
 ```sh
 git switch -c release/1.2.0 master && git push -u origin release/1.2.0
 ```
 
-`.github/workflows/release.yml` then runs the full CI against that commit,
+`.github/workflows/release.yml` then runs the full CI against that commit
+(and refuses to continue if the changelog lacks a `[1.2.0]` section),
 runs `mise run package`, tags the commit `v1.2.0`, publishes a GitHub
-Release with the archives, checksums and generated notes, and builds the
+Release whose notes are that changelog section followed by the generated
+list of merged pull requests, attaches the archives and checksums, and builds the
 example site for its GitHub Pages URL and deploys it there. That deploy is
 the demo at <https://haydenk.github.io/hugo-mimeo/>; it only moves on a
 release. A fix after a release is a new `release/1.2.1` branch, not a
