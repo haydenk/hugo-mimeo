@@ -2,7 +2,7 @@
 
 ![Mimeo: a blog that reads like a text file. 80 columns. Zero JavaScript. Yours to write.](images/brand/readme-cover.png)
 
-[Live demo](https://haydenk.github.io/mimeo/)
+[Live demo](https://haydenk.github.io/hugo-mimeo/)
 
 A Hugo theme that renders a blog the way a `.patch` file or a mailing-list
 archive reads: a message header, then the body, in a monospaced column that
@@ -52,18 +52,18 @@ X-Plain-Text:  /bible-notes/2026/10/31/serving-the-body-of-christ.txt
 ## Install
 
 Releases are tagged `vMAJOR.MINOR.PATCH`; see the
-[releases page](https://github.com/haydenk/mimeo/releases). Three ways in:
+[releases page](https://github.com/haydenk/hugo-mimeo/releases). Three ways in:
 
 **As a Hugo module** (recommended). Import it, then pin a version:
 
 ```toml
 [module]
   [[module.imports]]
-    path = "github.com/haydenk/mimeo"
+    path = "github.com/haydenk/hugo-mimeo"
 ```
 
 ```sh
-hugo mod get github.com/haydenk/mimeo@v1.2.0
+hugo mod get github.com/haydenk/hugo-mimeo@v1.2.0
 ```
 
 **From a release archive.** Each release ships `mimeo-<version>.tar.gz`
@@ -71,7 +71,7 @@ and `.zip`, both unpacking to a `mimeo/` directory. Extract into `themes/`
 and set `theme = 'mimeo'`:
 
 ```sh
-curl -fsSL https://github.com/haydenk/mimeo/releases/download/v1.2.0/mimeo-1.2.0.tar.gz \
+curl -fsSL https://github.com/haydenk/hugo-mimeo/releases/download/v1.2.0/mimeo-1.2.0.tar.gz \
   | tar -xz -C themes
 ```
 
@@ -87,7 +87,7 @@ set -euo pipefail
 version="1.2.0"
 if [ "$(cat themes/mimeo/VERSION 2>/dev/null)" = "$version" ]; then exit 0; fi
 rm -rf themes/mimeo && mkdir -p themes
-curl -fsSL "https://github.com/haydenk/mimeo/releases/download/v$version/mimeo-$version.tar.gz" \
+curl -fsSL "https://github.com/haydenk/hugo-mimeo/releases/download/v$version/mimeo-$version.tar.gz" \
   | tar -xz -C themes
 ```
 
@@ -280,7 +280,7 @@ git switch -c release/1.2.0 master && git push -u origin release/1.2.0
 runs `mise run package`, tags the commit `v1.2.0`, publishes a GitHub
 Release with the archives, checksums and generated notes, and builds the
 example site for its GitHub Pages URL and deploys it there. That deploy is
-the demo at <https://haydenk.github.io/mimeo/>; it only moves on a
+the demo at <https://haydenk.github.io/hugo-mimeo/>; it only moves on a
 release. A fix after a release is a new `release/1.2.1` branch, not a
 second push to the old one. One-time setup on GitHub after creating the
 repository: `mise run repo:sync` (description, homepage and topics from

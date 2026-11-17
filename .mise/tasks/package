@@ -23,6 +23,9 @@ for path in "${include[@]}"; do
 done
 rm -rf "$stage/mimeo/exampleSite/public" "$stage/mimeo/exampleSite/resources" \
   "$stage/mimeo/exampleSite/.hugo_build.lock"
+# The brand source image is for making icons, not for sites; static/ has
+# the icons themselves.
+rm -rf "$stage/mimeo/assets/brand"
 # Lets an installer (the mise task in the README, say) see what it has.
 printf '%s\n' "$version" > "$stage/mimeo/VERSION"
 

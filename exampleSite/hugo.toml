@@ -18,7 +18,7 @@ enableRobotsTXT = true
   [[params.social]]
     name = 'github'
     title = 'GitHub'
-    url = 'https://github.com/haydenk/mimeo'
+    url = 'https://github.com/haydenk/hugo-mimeo'
 
   [[params.social]]
     name = 'rss'

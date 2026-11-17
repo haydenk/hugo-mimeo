@@ -1,9 +1,9 @@
 name = "Mimeo"
 license = "AGPL-3.0"
-licenselink = "https://github.com/haydenk/mimeo/blob/main/LICENSE"
+licenselink = "https://github.com/haydenk/hugo-mimeo/blob/master/LICENSE"
 description = "A plain-text blog theme: every page reads like a patch or an email in a monospaced 80-column file. HTML only for links and images, no JavaScript, light and dark from the system preference."
-homepage = "https://github.com/haydenk/mimeo"
-demosite = "https://haydenk.github.io/mimeo/"
+homepage = "https://github.com/haydenk/hugo-mimeo"
+demosite = "https://haydenk.github.io/hugo-mimeo/"
 tags = [
   "blog",
   "minimal",

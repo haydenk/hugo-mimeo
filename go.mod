@@ -1,3 +1,3 @@
-module github.com/haydenk/mimeo
+module github.com/haydenk/hugo-mimeo
 
 go 1.26
