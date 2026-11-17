@@ -60,12 +60,13 @@ there.
 
 ## Releases
 
-Maintainers cut releases by pushing a `release/MAJOR.MINOR.PATCH` branch
-from `master`; see the README's Develop section. Contributors do not touch
-versions or tags, but do add a line under `[Unreleased]` in `CHANGELOG.md`
-for anything a site would notice. That section becomes the release notes,
-followed by the generated list of merged pull requests grouped by label,
-so a clear PR title helps too.
+Maintainers cut releases by renaming `[Unreleased]` in `CHANGELOG.md` on a
+`release/MAJOR.MINOR.PATCH` branch and merging its pull request; the merge
+to `master` tags and publishes. See the README's Develop section.
+Contributors do not touch versions or tags, but do add a line under
+`[Unreleased]` in `CHANGELOG.md` for anything a site would notice. That
+section becomes the release notes, followed by the generated list of
+merged pull requests grouped by label, so a clear PR title helps too.
 
 ## Licence
 
